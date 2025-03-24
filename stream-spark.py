@@ -37,10 +37,13 @@ def get_spark_results(url_results):
     else:
         st.error("Failed to fetch data")
 
-# UI
+# === UI === #
 
-st.title("Walmart Top 10 Spark Job")
-st.header("Trigger GitHub Spark Workflow")
+st.title("🛍️ Walmart Spark Analysis")
+st.write("Trigger your GitHub Spark workflow and explore the top 10 Walmart purchase insights.")
+
+# --- Trigger Spark Job Section ---
+st.header("🚀 Trigger Spark Workflow")
 
 github_user  = st.text_input('GitHub user', value='luissmontess')
 github_repo  = st.text_input('GitHub repo', value='stProject')
@@ -50,10 +53,21 @@ github_token = st.text_input('GitHub token', type='password')
 if st.button("POST spark-submit"):
     post_spark_job(github_user, github_repo, spark_job, github_token)
 
-st.header("View Spark Results (from GitHub)")
+# --- View Spark Results Section ---
+st.header("📊 View Spark Results")
 
-default_result_url = "https://raw.githubusercontent.com/luissmontess/stProject/main/results/top_expensive_purchases.json"
-result_url = st.text_input("Result URL (JSON file)", value=default_result_url)
+base_url = f"https://raw.githubusercontent.com/{github_user}/{github_repo}/main/results/"
+
+result_files = {
+    "Top 10 Expensive Purchases": "top_expensive_purchases.json",
+    "Top 10 Spending Cities": "top_spending_cities.json",
+    "Top 10 Rated Products": "top_rated_products.json"
+}
+
+selected_result = st.selectbox("Choose a result to view:", list(result_files.keys()))
+result_url = base_url + result_files[selected_result]
+
+st.write(f"Fetching result from:\n`{result_url}`")
 
 if st.button("GET spark results"):
     get_spark_results(result_url)
