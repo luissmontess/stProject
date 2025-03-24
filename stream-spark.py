@@ -29,10 +29,18 @@ def get_spark_results(url_results):
     if response.status_code == 200:
         try:
             data = response.json()
-            df = pd.json_normalize(data)
-            st.dataframe(df)
+            st.subheader("Raw JSON Data:")
+            st.write(data)
+
+            if isinstance(data, list):
+                df = pd.DataFrame(data)
+                st.subheader("Tabular View:")
+                st.dataframe(df)
+            else:
+                st.info("The result is not a list of records.")
         except Exception as e:
             st.error(f"Failed to parse JSON: {e}")
+            st.text("Raw response:")
             st.text(response.text)
     else:
         st.error("Failed to fetch data")
@@ -68,8 +76,6 @@ selected_result = st.selectbox("Choose a result to view:", list(result_files.key
 result_url = base_url + result_files[selected_result]
 
 st.write(f"Fetching result from:\n`{result_url}`")
-
-url_results= st.text_input('URL results', value=result_url)
 
 if st.button("GET spark results"):
     get_spark_results(result_url)
