@@ -1,0 +1,59 @@
+name: spark
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  repository_dispatch:
+    types: [spark]
+
+jobs:
+  spark:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: List project files
+      run: ls -la
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Set up Java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: temurin
+
+    - name: Set up Apache Spark
+      uses: vemonet/setup-spark@v1
+      with:
+        spark-version: '3.5.3'
+        hadoop-version: '3'
+
+    - name: Ensure results folder exists
+      run: mkdir -p results
+
+    - name: Run Spark job
+      run: spark-submit --master local data.py
+
+    - name: List results
+      run: ls -la results
+
+    - name: Commit and push Spark results
+      env: 
+        CI_COMMIT_MESSAGE: "Save Spark results"
+        CI_COMMIT_AUTHOR: "luissmontess"
+      run: |
+        git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+        git config --global user.email "a01747664@tec.mx"
+        git add results
+        git diff --staged --quiet || git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+        git push
