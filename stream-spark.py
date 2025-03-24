@@ -69,5 +69,7 @@ result_url = base_url + result_files[selected_result]
 
 st.write(f"Fetching result from:\n`{result_url}`")
 
+url_results= st.text_input('URL results', value=result_url)
+
 if st.button("GET spark results"):
     get_spark_results(result_url)
