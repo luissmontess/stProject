@@ -7,7 +7,7 @@ if __name__ == "__main__":
     spark = SparkSession.builder.appName("walmart_analysis").getOrCreate()
 
     # Load dataset
-    path_walmart = "Walmart_customer_purcheses.csv"
+    path_walmart = "Walmart_customer_purchases.csv"
     df_walmart = spark.read.csv(path_walmart, header=True, inferSchema=True)
 
     # Ensure results directory exists
